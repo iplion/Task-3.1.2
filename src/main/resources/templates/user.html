@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Spring Security Example</title>
+    <title>User Profile</title>
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
+<a th:href="@{/logout}">Logout here</a><br/>
 
+<h1>Welcome to your profile!</h1>
 
+<div>
+<!--    <p><strong>Name:</strong> <span th:text="${user.name != null ? user.name : 'No name set'}"></span></p>-->
+
+    <p><strong>Nickname:</strong> <span th:text="${user.nickname != null ? user.nickname : 'No nickname set'}"></span></p>
+
+    <p><strong>Status:</strong>
+        <span th:text="${(user.name == null && user.nickname == null) ? 'No name or nickname set' : ''}"></span>
+    </p>
+
+    <p><strong>Hair Color:</strong> <span th:text="${user.hairColor != null ? user.hairColor : 'No hair color set'}"></span></p>
+    <p><strong>Must Die?</strong> <span th:text="${user.isMustDie ? 'Yes' : 'No'}"></span></p>
+</div>
+
+<a th:href="@{/}">Go to Home</a>
 </body>
 </html>
