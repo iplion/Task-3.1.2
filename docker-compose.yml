@@ -1,6 +1,6 @@
 services:
   pdb:
-    container_name: pdb312
+    container_name: pdb313
     image: postgres:16.2-alpine3.19
     environment:
       POSTGRES_DB: "itm-db"

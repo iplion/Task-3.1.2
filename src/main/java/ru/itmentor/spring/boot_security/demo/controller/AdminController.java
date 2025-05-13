@@ -1,77 +1,63 @@
 package ru.itmentor.spring.boot_security.demo.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.itmentor.spring.boot_security.demo.entity.User;
 import ru.itmentor.spring.boot_security.demo.service.RoleService;
 import ru.itmentor.spring.boot_security.demo.service.UserService;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
-@Controller
-@RequestMapping("/admin")
+@RestController
+@RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {
-    private final String defaultRedirectPage = "redirect:/admin/users";
-
     private final UserService userService;
     private final RoleService roleService;
 
     @GetMapping("/users")
-    public String getAllUsers(Model model) {
-        model.addAttribute("users", userService.findAll());
-
-        return "users";
+    public List<User> getAllUsers() {
+        return userService.findAll();
     }
 
-    @GetMapping("/users/edit")
-    public String createNewUser(Model model) {
-        model.addAttribute("user", new User());
-
-        return "userEdit";
-    }
-
-    @GetMapping("/users/edit/{uuid}")
-    public String editUser(@PathVariable UUID uuid, Model model) {
+    @GetMapping("/users/{uuid}")
+    public ResponseEntity<User> getUser(@PathVariable UUID uuid) {
 
         return userService.findByUuid(uuid)
-            .map(user -> {
-                model.addAttribute("user", user);
-                model.addAttribute("allRoles", roleService.findAll());
-                return "userEdit";
-            })
-            .orElse(defaultRedirectPage);
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/users")
-    public String saveUser(@ModelAttribute User user) {
-        user.setPassword(userService.encodePassword(user.getPassword()));
-        userService.save(user);
-
-        return defaultRedirectPage;
+    public ResponseEntity<User> newUser(@RequestBody User user) {
+        return ResponseEntity.ok(userService.save(user));
     }
 
     @DeleteMapping("/users/{uuid}")
-    public String deleteUser(@PathVariable UUID uuid) {
-        userService.deleteByUuid(uuid);
-
-        return defaultRedirectPage;
+    public ResponseEntity<?> deleteUser(@PathVariable UUID uuid) {
+        return userService.findByUuid(uuid)
+            .map(user -> {
+                userService.deleteByUuid(uuid);
+                return ResponseEntity.ok().build();
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/users")
-    public String updateUser(@ModelAttribute User user) {
-        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            Optional<User> existingUser = userService.findByUuid(user.getUuid());
-            existingUser.ifPresent(existing -> user.setPassword(existing.getPassword()));
-        } else {
-            user.setPassword(userService.encodePassword(user.getPassword()));
-        }
-        userService.save(user);
+    @PutMapping("/users/{uuid}")
+    public ResponseEntity<User> updateUser(@PathVariable UUID uuid, @RequestBody User editedUser) {
+        return userService.findByUuid(uuid)
+            .map(user -> {
+                editedUser.setPassword(
+                    (editedUser.getPassword() == null || editedUser.getPassword().isEmpty())
+                        ? user.getPassword()
+                        : userService.encodePassword(editedUser.getPassword())
+                );
 
-        return defaultRedirectPage;
+                return ResponseEntity.ok(userService.save(editedUser));
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
 }
