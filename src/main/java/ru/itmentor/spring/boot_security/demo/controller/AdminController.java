@@ -48,6 +48,7 @@ public class AdminController {
 
     @PostMapping("/users")
     public String saveUser(@ModelAttribute User user) {
+        user.setPassword(userService.encodePassword(user.getPassword()));
         userService.save(user);
 
         return defaultRedirectPage;
@@ -63,12 +64,10 @@ public class AdminController {
     @PutMapping("/users")
     public String updateUser(@ModelAttribute User user) {
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            // Если пароль не изменен, восстанавливаем старый пароль
             Optional<User> existingUser = userService.findByUuid(user.getUuid());
             existingUser.ifPresent(existing -> user.setPassword(existing.getPassword()));
         } else {
-            // Если введен новый пароль, кодируем его
-            user.setPassword(user.getPassword());
+            user.setPassword(userService.encodePassword(user.getPassword()));
         }
         userService.save(user);
 

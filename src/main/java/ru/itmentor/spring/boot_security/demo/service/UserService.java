@@ -30,14 +30,12 @@ public class UserService {
         return  userRepository.findByNicknameOrNameAddRole(login);
     }
 
-//    public String getLogin(User user) {
-//        return (user.getName() == null || user.getName().trim().isEmpty()) ? user.getNickname() : user.getName();
-//    }
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
 
     @Transactional
     public User save(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         return userRepository.save(user);
     }
 
