@@ -24,11 +24,11 @@ public class DataInitializer implements CommandLineRunner {
         if (userService.findAll().isEmpty()) {
             Role roleUser = roleService.save("ROLE_USER");
             Role roleAdmin = roleService.save("ROLE_ADMIN");
-            userService.save(new User("Gogi", null, "black", "password", Arrays.asList(roleUser)));
-            userService.save(new User("Vasilek", "user", "red", "password", Arrays.asList(roleUser)));
-            userService.save(new User("", "null", "blue", "password", Arrays.asList(roleUser)));
-            userService.save(new User(null, "admin", "yellow", "password", Arrays.asList(roleAdmin)));
-            userService.save(new User("Gavrilla", null, "purple", "password", Arrays.asList(roleUser, roleAdmin)));
+            userService.save(new User("Gogi", null, "black", userService.encodePassword("password"), Arrays.asList(roleUser)));
+            userService.save(new User("Vasilek", "user", "red", userService.encodePassword("password"), Arrays.asList(roleUser)));
+            userService.save(new User("", "null", "blue", userService.encodePassword("password"), Arrays.asList(roleUser)));
+            userService.save(new User(null, "admin", "yellow", userService.encodePassword("password"), Arrays.asList(roleAdmin)));
+            userService.save(new User("Gavrilla", null, "purple", userService.encodePassword("password"), Arrays.asList(roleUser, roleAdmin)));
         }
     }
 }
